@@ -90,7 +90,7 @@ public:
         return *this;
     }
 
-    void open(AMQP::Connection* connection_p, bool declare = true)
+    void open(AMQP::Connection* connection_p, bool declare = false)
     {
         try
         {
@@ -197,7 +197,7 @@ public:
     {
     }
 
-    void open(AMQP::Connection* connection_p, bool declare = true)
+    void open(AMQP::Connection* connection_p, bool declare = false)
     {
         try
         {
@@ -288,7 +288,7 @@ public:
         return *this;
     }
 
-    void open(AMQP::Connection* connection_p, bool declare = true)
+    void open(AMQP::Connection* connection_p, bool declare = false)
     {
         try
         {
