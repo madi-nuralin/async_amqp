@@ -90,7 +90,7 @@ public:
         return *this;
     }
 
-    void open(AMQP::Connection* connection_p)
+    void open(AMQP::Connection* connection_p, bool declare = true)
     {
         try
         {
@@ -99,22 +99,25 @@ public:
             channel_o_.emplace(connection_p);
             channel_o_->onError(std::bind(&channel_t_::on_channel_error_, this, _1));
 
-            channel_o_->declareExchange(
-                exchange_,
-                exchange_type_,
-                exchange_flags_,
-                exchange_arguments_);
-
-            channel_o_->declareQueue(
-                queue_,
-                queue_flags_,
-                queue_arguments_);
-
-            channel_o_->bindQueue(
-                exchange_,
-                queue_,
-                routing_key_,
-                bind_arguments_);
+            if (declare)
+            {
+                channel_o_->declareExchange(
+                    exchange_,
+                    exchange_type_,
+                    exchange_flags_,
+                    exchange_arguments_);
+    
+                channel_o_->declareQueue(
+                    queue_,
+                    queue_flags_,
+                    queue_arguments_);
+    
+                channel_o_->bindQueue(
+                    exchange_,
+                    queue_,
+                    routing_key_,
+                    bind_arguments_);
+            }
         }
         catch (...)
         {
@@ -194,13 +197,13 @@ public:
     {
     }
 
-    void open(AMQP::Connection* connection_p)
+    void open(AMQP::Connection* connection_p, bool declare = true)
     {
         try
         {
             assert(connection_p != nullptr);
 
-            base_t_::open(connection_p);
+            base_t_::open(connection_p, declare);
             base_t_::channel_o_->consume(base_t_::queue_).onReceived(std::bind(&in_channel_t_::on_received_, this, _1, _2, _3));
         }
         catch (...)
@@ -285,13 +288,13 @@ public:
         return *this;
     }
 
-    void open(AMQP::Connection* connection_p)
+    void open(AMQP::Connection* connection_p, bool declare = true)
     {
         try
         {
             assert(connection_p != nullptr);
 
-            base_t_::open(connection_p);
+            base_t_::open(connection_p, declare);
             base_t_::channel_o_->onReady(std::bind(&out_channel_t_::on_channel_ready_, this));
 
             reliable_o_.emplace(*base_t_::channel_o_);
